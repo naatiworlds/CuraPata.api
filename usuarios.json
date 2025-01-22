@@ -1,0 +1,113 @@
+[
+    {
+      "nombreUsuario": "nati",
+      "correo": "nati@example.com",
+      "secreto": "pass1234",
+      "animales": [],
+      "rol": "admin",
+      "descripcion": "Amante de los animales y la naturaleza.",
+      "ubicacion": "Buenos Aires, Argentina",
+      "telefono": "+54 911 2345 6789",
+      "fechaRegistro": "2023-05-12"
+    },
+    {
+      "nombreUsuario": "rafa",
+      "correo": "rafa@example.com",
+      "secreto": "pass1234",
+      "animales": [],
+      "rol": "admin",
+      "descripcion": "Administrador del sistema.",
+      "ubicacion": "Madrid, España",
+      "telefono": "+34 612 345 678",
+      "fechaRegistro": "2022-11-03"
+    },
+    {
+      "nombreUsuario": "jose_alfonso",
+      "correo": "jose_alfonso@example.com",
+      "secreto": "pass1234",
+      "animales": [],
+      "rol": "usuario",
+      "descripcion": "Veterinaria apasionada.",
+      "ubicacion": "Lima, Perú",
+      "telefono": "+51 987 654 321",
+      "fechaRegistro": "2023-01-25"
+    },
+    {
+      "nombreUsuario": "marco_diaz",
+      "correo": "marco.diaz@example.com",
+      "secreto": "adminpass90",
+      "animales": [],
+      "rol": "moderador",
+      "descripcion": "Moderador de la comunidad.",
+      "ubicacion": "Ciudad de México, México",
+      "telefono": "+52 55 1234 5678",
+      "fechaRegistro": "2021-08-14"
+    },
+    {
+      "nombreUsuario": "valentina_lopez",
+      "correo": "valentina.lopez@example.com",
+      "secreto": "securePass123",
+      "animales": [],
+      "rol": "usuario",
+      "descripcion": "Diseñadora gráfica freelance.",
+      "ubicacion": "Bogotá, Colombia",
+      "telefono": "+57 310 456 7890",
+      "fechaRegistro": "2023-04-09"
+    },
+    {
+      "nombreUsuario": "andres_martinez",
+      "correo": "andres.martinez@example.com",
+      "secreto": "password!@#",
+      "animales": [],
+      "rol": "usuario",
+      "descripcion": "Fanático de los deportes.",
+      "ubicacion": "Santiago, Chile",
+      "telefono": "+56 9 8765 4321",
+      "fechaRegistro": "2022-07-30"
+    },
+    {
+      "nombreUsuario": "isabella_gomez",
+      "correo": "isabella.gomez@example.com",
+      "secreto": "isabella2023",
+      "animales": [],
+      "rol": "admin",
+      "descripcion": "Creadora de contenido digital.",
+      "ubicacion": "Montevideo, Uruguay",
+      "telefono": "+598 92 345 678",
+      "fechaRegistro": "2021-12-11"
+    },
+    {
+      "nombreUsuario": "sebastian_ruiz",
+      "correo": "sebastian.ruiz@example.com",
+      "secreto": "sebRuiz99",
+      "animales": [],
+      "rol": "moderador",
+      "descripcion": "Explorador y amante de los viajes.",
+      "ubicacion": "Quito, Ecuador",
+      "telefono": "+593 98 765 4321",
+      "fechaRegistro": "2023-02-18"
+    },
+    {
+      "nombreUsuario": "camila_fernandez",
+      "correo": "camila.fernandez@example.com",
+      "secreto": "camiPass321",
+      "animales": [],
+      "rol": "usuario",
+      "descripcion": "Estudiante de biología.",
+      "ubicacion": "Asunción, Paraguay",
+      "telefono": "+595 981 234 567",
+      "fechaRegistro": "2022-10-05"
+    },
+    {
+      "nombreUsuario": "mateo_silva",
+      "correo": "mateo.silva@example.com",
+      "secreto": "mateoSecure1",
+      "animales": [],
+      "rol": "usuario",
+      "descripcion": "Desarrollador web.",
+      "ubicacion": "São Paulo, Brasil",
+      "telefono": "+55 11 91234 5678",
+      "fechaRegistro": "2023-06-21"
+    }
+  ]
+  
