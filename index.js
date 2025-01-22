@@ -28,8 +28,7 @@ app.use("/animales", animalesRoutes);
 
 // Configuración del puerto
 const PORT = process.env.PORT || 3000;
-const HOST = "localhost";
 
-app.listen(PORT, HOST, () => {
-  console.log(`Servidor corriendo en http://${HOST}:${PORT}`);
+app.listen(PORT, () => {
+  console.log(`Servidor corriendo en http://localhost:${PORT}`);
 });
