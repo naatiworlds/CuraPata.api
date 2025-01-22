@@ -117,24 +117,24 @@ export const obtenerAnimales = async (req, res) => {
     }
 };
 
-export const obtenerAnimalesPorDuenio = async (req, res) => {
-    const {nombre} = req.params;
-    if (!nombre) {
-        return res.status(400).json({
-            error: "El nombre de usuario es requerido para buscar un usuario",
-        });
-    }
+// export const obtenerAnimalesPorDuenio = async (req, res) => {
+//     const {nombre} = req.params;
+//     if (!nombre) {
+//         return res.status(400).json({
+//             error: "El nombre de usuario es requerido para buscar un usuario",
+//         });
+//     }
 
-    try {
-        // Buscar el usuario por nombre
-        const animal = await Animales.find({duenio: nombre});
-        res.json(animal);
-    } catch (error) {
-        res
-            .status(500)
-            .json({error: "Error al buscar el usuario", details: error.message});
-    }
-};
+//     try {
+//         // Buscar el usuario por nombre
+//         const animal = await Animales.find({duenio: nombre});
+//         res.json(animal);
+//     } catch (error) {
+//         res
+//             .status(500)
+//             .json({error: "Error al buscar el usuario", details: error.message});
+//     }
+// };
 
 export const editarAnimal = async (req, res) => {
     const {id} = req.params;

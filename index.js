@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import connectDB from "./config/db.js";
 import usuarioRoutes from "./routes/usuarioRoutes.js";
 import animalesRoutes from "./routes/animalesRoutes.js";
-
+import contactosRoutes from "./routes/contactosRoutes.js"
 // Configuración de variables de entorno
 dotenv.config();
 
@@ -25,6 +25,7 @@ app.use(express.json()); // Reemplaza body-parser
 // Rutas
 app.use("/usuarios", usuarioRoutes);
 app.use("/animales", animalesRoutes);
+app.use("/contactos", contactosRoutes);
 
 // Configuración del puerto
 const PORT = process.env.PORT || 3000;
