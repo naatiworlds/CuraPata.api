@@ -1,0 +1,19 @@
+{
+  "vendedor": "id_usuario?",
+
+  "nombre": "pastillas der cani",
+
+  "descripcion": "pastillas para hacerte el cani",
+
+  "precio": 59.99,
+
+  "moneda": "USD",
+
+  "stock": 120,
+
+  "categoria": "medicina",
+
+  "fecha_publicacion": "2025-01-21",
+
+  "revisada": true
+}
