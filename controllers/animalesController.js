@@ -3,116 +3,85 @@ import Usuarios from "../models/Usuarios.js";
 import mongoose from "mongoose";
 
 export const crearAnimal = async (req, res) => {
-    const {nombre, especie, raza, edad, estadoSalud, duenio, perdida, adoptada, fechaRegistro} =
-        req.body;
+  const {
+    nombre,
+    especie,
+    raza,
+    edad,
+    estadoSalud,
+    duenio,
+    perdida,
+    adoptada,
+  } = req.body;
 
-    // Validación de campos
-    if (
-        !nombre ||
-        !especie ||
-        !raza ||
-        !edad ||
-        !estadoSalud ||
-        !duenio 
-    ) {
-        return res.status(400).json({error: "Todos los campos son requeridos"});
+  // Validación de campos
+  if (!nombre || !especie || !raza || !edad || !estadoSalud || !duenio) {
+    return res.status(400).json({ error: "Todos los campos son requeridos" });
+  }
+
+  try {
+    // Verificar que el usuario exista
+    const usuario = await Usuarios.findById(duenio);
+    if (!usuario) {
+      return res.status(404).json({ error: "Usuario no encontrado" });
     }
 
-    try {
-        // Crear instancia del modelo
-        const animal = new Animales({
-            nombre,
-            especie,
-            raza,
-            edad,
-            estadoSalud,
-            duenio,
-            perdida,
-            adoptada
-        });
-        await animal.save();
-        res.json({message: "Animal registrado con éxito", animal});
+    // Crear instancia del modelo Animales
+    const animal = new Animales({
+      nombre,
+      especie,
+      raza,
+      edad,
+      estadoSalud,
+      duenio, // Referencia al ID del usuario
+      perdida,
+      adoptada,
+    });
 
-        // agregar animal al usuario desde el servidor :D
-        const usuario = await Usuarios.find({nombreUsuario: duenio});
-        if (usuario) {
-            usuario[0].animales.push(animal._id);
-            await usuario[0].save();
-        }
+    await animal.save();
 
-    } catch (error) {
-        res
-            .status(500)
-            .json({error: "Error al agregar el animal", details: error.message});
-    }
+    // Asociar el animal al usuario
+    usuario.animales.push(animal._id);
+    await usuario.save();
+
+    res.json({ message: "Animal registrado con éxito", animal });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "Error al agregar el animal", details: error.message });
+  }
 };
 
 export const obtenerAnimales = async (req, res) => {
-    const {
-        _id,
-        nombre,
-        especie,
-        raza,
-        edad,
-        estadoSalud,
-        duenio,
-        perdida,
-        adoptada,
-        fechaRegistro,
-        page = 1,
-        limit = 99,
-    } = req.query;
+  const { page = 1, limit = 99, ...query } = req.query;
 
-    // Crear el filtro dinámico
-    const filter = [
-        { key: "_id", value: _id ? mongoose.Types.ObjectId.isValid(_id) ? _id : null : null },
-        { key: "nombre", value: nombre },
-        { key: "especie", value: especie },
-        { key: "raza", value: raza },
-        { key: "edad", value: edad ? Number(edad) : null },
-        { key: "estadoSalud", value: estadoSalud },
-        { key: "duenio", value: duenio },
-        { key: "perdida", value: perdida },
-        { key: "adoptada", value: adoptada },
+  try {
+    const pageNumber = Math.max(1, parseInt(page, 10));
+    const limitNumber = Math.max(1, parseInt(limit, 10));
 
-        {
-            key: "fechaRegistro",
-            value: fechaRegistro ? { $gte: new Date(fechaRegistro) } : null,
-        },
-    ].reduce((acc, { key, value }) => {
-        if (value !== undefined && value !== null) {
-            acc[key] =
-                typeof value === "string" && key !== "_id" // Excluir regex para _id
-                    ? { $regex: value, $options: "i" }
-                    : value;
-        }
-        return acc;
+    // Crear filtro dinámico
+    const filter = Object.entries(query).reduce((acc, [key, value]) => {
+      if (value !== undefined && value !== null) {
+        acc[key] = key !== "_id" ? { $regex: value, $options: "i" } : value;
+      }
+      return acc;
     }, {});
 
-    try {
-        const pageNumber = Math.max(1, parseInt(page, 10));
-        const limitNumber = Math.max(1, parseInt(limit, 10));
+    // Buscar animales y popular el campo duenio
+    const [animales, total] = await Promise.all([
+      Animales.find(filter)
+        .populate("duenio", "nombreUsuario correo") // Mostrar solo campos necesarios
+        .skip((pageNumber - 1) * limitNumber)
+        .limit(limitNumber),
+      Animales.countDocuments(filter),
+    ]);
 
-        // Consultar la base de datos
-        const [animales, total] = await Promise.all([
-            Animales.find(filter)
-                .skip((pageNumber - 1) * limitNumber)
-                .limit(limitNumber),
-            Animales.countDocuments(filter),
-        ]);
-
-        res.json({
-            total,
-            page: pageNumber,
-            limit: limitNumber,
-            animales: animales,
-        });
-    } catch (error) {
-        res.status(500).json({
-            error: "Error al obtener los animales",
-            details: error.message,
-        });
-    }
+    res.json({ total, page: pageNumber, limit: limitNumber, animales });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "Error al obtener los animales", details: error.message });
+  }
 };
 
 // export const obtenerAnimalesPorDuenio = async (req, res) => {
@@ -135,56 +104,72 @@ export const obtenerAnimales = async (req, res) => {
 // };
 
 export const editarAnimal = async (req, res) => {
-    const {id} = req.params;
+  const { id } = req.params;
 
-    // Validación de campos
-    if (!id) {
-        return res.status(400).json({error: 'Todos los campos son requeridos para actualizar un animal'});
-    }
+  // Validación de campos
+  if (!id) {
+    return res.status(400).json({
+      error: "Todos los campos son requeridos para actualizar un animal",
+    });
+  }
 
-    try {
-        // Buscar y actualizar el animal por nombre
-        const animalActualizado = await Animales.findByIdAndUpdate(
-            id,
-            req.body, {
-                new: true,
-            }
-        );
+  try {
+    // Buscar y actualizar el animal por nombre
+    const animalActualizado = await Animales.findByIdAndUpdate(id, req.body, {
+      new: true,
+    });
 
-        res.json({message: "Animal actualizado con éxito", animalActualizado});
-    } catch (error) {
-        res.status(500).json({error: 'Error al actualizar el animal', details: error.message});
-    }
+    res.json({ message: "Animal actualizado con éxito", animalActualizado });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "Error al actualizar el animal", details: error.message });
+  }
 };
 
 export const eliminarAnimal = async (req, res) => {
-    const {id} = req.params;
+  const { id } = req.params;
 
-    // Validación de campos
-    if (!id) {
-        return res.status(400).json({error: 'La ID es requerida para eliminar un animal'});
+  if (!id) {
+    return res
+      .status(400)
+      .json({ error: "La ID es requerida para eliminar un animal" });
+  }
+
+  try {
+    const animalBorrado = await Animales.findByIdAndDelete(id);
+
+    if (!animalBorrado) {
+      return res.status(404).json({ error: "Animal no encontrado" });
     }
 
-    try {
-        // Buscar y eliminar el animal por nombre
-        const animalBorrado = await Animales.findByIdAndDelete(id)
-        res.json({message: "Animal borrado con éxito", animal: animalBorrado});
-    } catch (error) {
-        res.status(500).json({error: 'Error al borrar el animal', details: error.message});
-    }
+    // Eliminar referencia del usuario
+    await Usuarios.findByIdAndUpdate(animalBorrado.duenio, {
+      $pull: { animales: id },
+    });
+
+    res.json({ message: "Animal borrado con éxito", animal: animalBorrado });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "Error al borrar el animal", details: error.message });
+  }
 };
 
 export const obtenerAnimal = async (req, res) => {
+  const { id } = req.params;
+  if (!id) {
+    return res
+      .status(400)
+      .json({ error: "El ID es requerido para buscar un animal" });
+  }
 
-    const {id} = req.params;
-    if (!id) {
-        return res.status(400).json({error: "El ID es requerido para buscar un animal"});
-    }
-
-    try {
-        const animal = await Animales.findById(id);
-        res.json(animal);
-    } catch (error) {
-        res.status(500).json({error: "Error al buscar el animal", details: error.message});
-    }
-}
+  try {
+    const animal = await Animales.findById(id);
+    res.json(animal);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "Error al buscar el animal", details: error.message });
+  }
+};

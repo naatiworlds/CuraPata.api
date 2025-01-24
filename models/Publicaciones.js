@@ -3,7 +3,12 @@ import { Schema, model } from "mongoose";
 const currentDate = new Date(); // Definición correcta de currentDate
 
 const userSchema = new Schema({
-  autor: { type: String, required: false, default: "" },
+  autor: {
+    type: Schema.Types.ObjectId,
+    ref: "Usuario",
+    required: false,
+    default: "",
+  },
   titulo: { type: String, required: false, default: "" },
   subtitulo: { type: String, required: false, default: "" },
   resumen: { type: String, required: false, default: "" },
@@ -14,7 +19,7 @@ const userSchema = new Schema({
     required: true,
     default: () => currentDate.toLocaleDateString(), // Usar una función para valores dinámicos por documento
   },
-  revisada: { type: Boolean, required: false, default: "" },
+  revisada: { type: Boolean, required: false, default: false },
 });
 
 export default model("Publicaciones", userSchema);

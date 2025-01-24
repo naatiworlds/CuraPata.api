@@ -19,6 +19,6 @@ router.get('/', obtenerContactos);
 router.put('/:id', editarContacto);
 
 // Eliminar usuario (se recomienda especificar el ID)
-router.delete('/', eliminarContacto);
+router.delete('/:id', eliminarContacto);
 
 export default router;

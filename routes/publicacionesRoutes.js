@@ -19,6 +19,6 @@ router.get('/', obtenerPublicaciones);
 router.put('/:id', editarPublicacion);
 
 // Eliminar usuario (se recomienda especificar el ID)
-router.delete('/', eliminarPublicacion);
+router.delete('/:id', eliminarPublicacion);
 
 export default router;

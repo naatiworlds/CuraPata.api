@@ -7,7 +7,7 @@ const userSchema = new Schema({
   nombre: { type: String, required: false },
   correo: { type: String, required: true },
   secreto: { type: String, required: true },
-  animales: { type: [String], required: false, default: [] }, // Definir tipo explícito para el array
+  animales: { type: [Schema.Types.ObjectId], ref: 'Animales', required: false, default: [] }, // Definir tipo explícito para el array
   rol: { type: String, required: true, default: "usuario" },
   descripcion: { type: String, required: false, default: "" },
   ubicacion: { type: String, required: false, default: "" },

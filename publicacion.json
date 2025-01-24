@@ -1,8 +1,19 @@
 {
-  "autor": "id_usuario?",
-  "titulo": "como convertirse en millonario",
-  "mensaje": "ganando la loteria cojones",
-  "categoria": "salud",
-  "fecha_creacion": "2025-01-21T10:30:00Z",
-  "revisada": true
+
+    "autor": "id_usuario?",
+
+    "titulo": "como convertirse en millonario",
+
+    "subtitulo": "los secretos de los ricos",
+
+    "resumen": "una historia sobre la loteria",
+
+    "mensaje": "textotextotextotextotextotextotextotextotextotextotextotextotexto",
+
+    "categoria": "salud",
+
+    "fecha_creacion": "2025-01-21",
+
+    "revisada": true
+
 }
