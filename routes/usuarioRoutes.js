@@ -6,13 +6,15 @@ import {
   editarUsuario,
   eliminarUsuario,
   inicioSesion,
-  obtenerUsuarioPorNombre
+  obtenerUsuarioPorNombre,
+  subirFotoPerfil
 } from '../controllers/usuarioController.js';
+import upload from '../middlewares/upload.js';
 
 const router = Router();
 
 // Crear usuario
-router.post('/', crearUsuario);
+router.post('/', upload.single('fotoPerfil'), crearUsuario);
 
 // Obtener todos los usuarios
 router.get('/', obtenerUsuarios);
@@ -23,10 +25,13 @@ router.get('/u/:nombreUsuario', obtenerUsuarioPorNombre);
 // Iniciar sesión
 router.post('/login', inicioSesion);
 
+router.post('/upload-profile-pic/:id', upload.single('fotoPerfil'), subirFotoPerfil);
+
+
 // Editar usuario por ID
 router.put('/:id', editarUsuario);
 
 // Eliminar usuario (se recomienda especificar el ID)
-router.delete('/', eliminarUsuario);
+router.delete('/:id', eliminarUsuario);
 
 export default router;

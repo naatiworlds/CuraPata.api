@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
 import Usuarios from "../models/Usuarios.js";
 import bcrypt from "bcryptjs"; // Corregir el nombre del paquete bcrypt
+import path from "path";
+
 
 export const crearUsuario = async (req, res) => {
   const {
@@ -14,7 +16,6 @@ export const crearUsuario = async (req, res) => {
     ubicacion,
     telefono,
   } = req.body;
-
   // Validación de campos
   if (!nombreUsuario || !correo || !secreto) {
     return res.status(400).json({ error: "Todos los campos son requeridos" });
@@ -33,9 +34,8 @@ export const crearUsuario = async (req, res) => {
       return res.status(400).json({ error: "El usuario ya está registrado" });
     }
 
-    // Cifrar la contraseña antes de guardarla
+    // Crear el nuevo usuario
     const hashedPassword = await bcrypt.hash(secreto, 10);
-
     const user = new Usuarios({
       nombreUsuario,
       nombre,
@@ -47,12 +47,18 @@ export const crearUsuario = async (req, res) => {
       ubicacion,
       telefono,
     });
+
+    // Si se subió una foto de perfil, asignarla al usuario
+    if (req.file) {
+      const fotoPerfilUrl = path.join("uploads", req.file.filename);
+      user.fotoPerfil = fotoPerfilUrl;
+    }
+
+    // Guardar el usuario
     await user.save();
     res.json({ message: "Usuario registrado con éxito", user });
   } catch (error) {
-    res
-      .status(500)
-      .json({ error: "Error al agregar el usuario", details: error.message });
+    res.status(500).json({ error: "Error al agregar el usuario", details: error.message });
   }
 };
 
@@ -114,8 +120,6 @@ export const obtenerUsuarios = async (req, res) => {
       res.status(500).json({error: "Error al obtener los usuarios", details: error.message});
   }
 };
-
-
 
 export const obtenerUsuarioPorNombre = async (req, res) => {
   const {nombreUsuario} = req.params;
@@ -179,5 +183,33 @@ export const eliminarUsuario = async (req, res) => {
     res
       .status(500)
       .json({ error: "Error al borrar el usuario", details: error.message });
+  }
+};
+
+export const subirFotoPerfil = async (req, res) => {
+  const { id } = req.params;
+
+  if (!id) {
+    return res.status(400).json({ error: "El ID del usuario es requerido" });
+  }
+
+  if (!req.file) {
+    return res.status(400).json({ error: "Se requiere una imagen para la foto de perfil" });
+  }
+
+  try {
+    const usuario = await Usuarios.findById(id);
+    if (!usuario) {
+      return res.status(404).json({ error: "Usuario no encontrado" });
+    }
+
+    // Actualizar el campo de la foto de perfil con la URL de la imagen
+    const fotoPerfilUrl = path.join("uploads", req.file.filename);
+    usuario.fotoPerfil = fotoPerfilUrl;
+    await usuario.save();
+
+    res.json({ message: "Foto de perfil actualizada con éxito", fotoPerfil: fotoPerfilUrl });
+  } catch (error) {
+    res.status(500).json({ error: "Error al actualizar la foto de perfil", details: error.message });
   }
 };
