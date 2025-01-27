@@ -14,7 +14,7 @@ import upload from '../middlewares/upload.js';
 const router = Router();
 
 // Crear usuario
-router.post('/', upload.single('fotoPerfil'), crearUsuario);
+router.post('/', crearUsuario);
 
 // Obtener todos los usuarios
 router.get('/', obtenerUsuarios);
@@ -29,7 +29,7 @@ router.post('/upload-profile-pic/:id', upload.single('fotoPerfil'), subirFotoPer
 
 
 // Editar usuario por ID
-router.put('/:id', editarUsuario);
+router.put('/:id', upload.single('fotoPerfil'), editarUsuario);
 
 // Eliminar usuario (se recomienda especificar el ID)
 router.delete('/:id', eliminarUsuario);

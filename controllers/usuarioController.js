@@ -53,10 +53,7 @@ export const crearUsuario = async (req, res) => {
     });
 
     // Si se subió una foto de perfil, asignarla al usuario
-    if (req.file) {
-      const fotoPerfilUrl = path.join("uploads", req.file.filename);
-      user.fotoPerfil = fotoPerfilUrl;
-    }
+    
 
     // Guardar el usuario
     await user.save();
@@ -150,27 +147,44 @@ export const obtenerUsuarioPorNombre = async (req, res) => {
 };
 
 
+
 export const editarUsuario = async (req, res) => {
   const { id } = req.params;
 
   if (!id) {
-    return res
-      .status(400)
-      .json({ error: "El ID es requerido para editar un usuario" });
+    return res.status(400).json({ error: 'El ID es requerido para editar un usuario' });
   }
 
   try {
-    // Buscar y actualizar el usuario por ID
-    const usuarioActualizado = await Usuarios.findByIdAndUpdate(id, req.body, {
-      new: true,
-    });
-    res.json({ message: "Usuario actualizado con éxito", usuarioActualizado });
+    // Buscar el usuario por ID
+    const usuario = await Usuarios.findById(id);
+    
+    if (!usuario) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+
+    // Si hay un archivo (foto de perfil), actualizar la URL de la foto
+    if (req.file) {
+      const fotoPerfilUrl = path.join('uploads', 'usuarios', req.file.filename); // Asumimos que la ruta es la correcta
+      usuario.fotoPerfil = fotoPerfilUrl;
+    }
+
+    // Actualizar el resto de los campos
+    const { nombreUsuario, correo, telefono, descripcion } = req.body;
+    usuario.nombreUsuario = nombreUsuario || usuario.nombreUsuario;
+    usuario.correo = correo || usuario.correo;
+    usuario.telefono = telefono || usuario.telefono;
+    usuario.descripcion = descripcion || usuario.descripcion;
+
+    // Guardar los cambios en la base de datos
+    await usuario.save();
+
+    res.json({ message: 'Usuario actualizado con éxito', usuarioActualizado: usuario });
   } catch (error) {
-    res
-      .status(500)
-      .json({ error: "Error al editar el usuario", details: error.message });
+    res.status(500).json({ error: 'Error al editar el usuario', details: error.message });
   }
 };
+
 
 export const eliminarUsuario = async (req, res) => {
   const { id } = req.params; // Corregir la asignación
