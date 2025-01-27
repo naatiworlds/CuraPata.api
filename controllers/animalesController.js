@@ -1,6 +1,5 @@
 import Animales from "../models/Animales.js";
 import Usuarios from "../models/Usuarios.js";
-import mongoose from "mongoose";
 
 export const crearAnimal = async (req, res) => {
   const {

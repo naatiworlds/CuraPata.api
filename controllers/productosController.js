@@ -2,28 +2,19 @@ import Productos from "../models/Productos.js";
 import Usuarios from "../models/Usuarios.js";
 
 export const crearProducto = async (req, res) => {
-  const {
-    vendedor,
-    nombre,
-    descripcion,
-    precio,
-    moneda,
-    stock,
-    categoria,
-  } = req.body;
+  const { vendedor, nombre, descripcion, precio, moneda, stock, categoria } =
+    req.body;
 
   // Validación de campos requeridos
-  if (!nombre || !precio || !moneda || !stock || !categoria) {
+  if (!vendedor || !nombre || !precio || !moneda || !stock || !categoria) {
     return res.status(400).json({ error: "Todos los campos son requeridos" });
   }
 
   try {
     // Verificar si el vendedor existe (si se proporciona)
-    if (vendedor) {
-      const usuario = await Usuarios.findById(vendedor);
-      if (!usuario) {
-        return res.status(404).json({ error: "Vendedor no encontrado" });
-      }
+    const usuario = await Usuarios.findById(vendedor);
+    if (!usuario) {
+      return res.status(404).json({ error: "Vendedor no encontrado" });
     }
 
     // Crear una nueva instancia del producto
@@ -38,6 +29,11 @@ export const crearProducto = async (req, res) => {
     });
 
     await producto.save();
+
+    // Ahora, agregar la publicación al array de publicaciones del usuario
+    usuario.productos.push(producto._id);
+    await usuario.save();
+
     res.json({ message: "Producto creado con éxito", producto });
   } catch (error) {
     res

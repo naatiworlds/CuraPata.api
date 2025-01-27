@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Usuarios y Animales</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .usuario {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 10px;
+        }
+        .usuario img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+        .animales {
+            margin-top: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Usuarios y sus Animales</h1>
+    <div id="usuarios-container"></div>
+
+    <script>
+        async function obtenerUsuarios() {
+            try {
+                const response = await fetch('https://curapata-api.onrender.com/usuarios');
+                const data = await response.json();
+
+                if (data && data.usuarios && data.usuarios.length > 0) {
+                    mostrarUsuarios(data.usuarios);
+                } else {
+                    document.getElementById('usuarios-container').innerHTML = '<p>No se encontraron usuarios.</p>';
+                }
+            } catch (error) {
+                console.error('Error al obtener los datos:', error);
+                document.getElementById('usuarios-container').innerHTML = '<p>Error al cargar los datos.</p>';
+            }
+        }
+
+        function mostrarUsuarios(usuarios) {
+            let usuariosHtml = '';
+            
+            usuarios.forEach(usuario => {
+                usuariosHtml += `
+                    <div class="usuario">
+                        <h2>${usuario.nombre} (${usuario.nombreUsuario})</h2>
+                        <img src="${usuario.fotoPerfil}" alt="Foto de perfil">
+                        <p><strong>Correo:</strong> ${usuario.correo}</p>
+                        <p><strong>Descripción:</strong> ${usuario.descripcion}</p>
+                        <p><strong>Ubicación:</strong> ${usuario.ubicacion}</p>
+                        <p><strong>Teléfono:</strong> ${usuario.telefono}</p>
+                        <p><strong>Fecha de Registro:</strong> ${usuario.fechaRegistro}</p>
+                        <h3>Animales:</h3>
+                        <div class="animales">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Nombre</th>
+                                        <th>Especie</th>
+                                        <th>Raza</th>
+                                        <th>Estado de Salud</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${usuario.animales.map(animal => `
+                                        <tr>
+                                            <td>${animal.nombre}</td>
+                                            <td>${animal.especie}</td>
+                                            <td>${animal.raza}</td>
+                                            <td>${animal.estadoSalud}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+            });
+
+            document.getElementById('usuarios-container').innerHTML = usuariosHtml;
+        }
+
+        // Llamar a la función para obtener los datos de la API
+        obtenerUsuarios();
+    </script>
+</body>
+</html>

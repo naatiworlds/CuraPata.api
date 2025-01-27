@@ -15,6 +15,8 @@ export const crearUsuario = async (req, res) => {
     descripcion,
     ubicacion,
     telefono,
+    publicaciones,
+    productos
   } = req.body;
   // Validación de campos
   if (!nombreUsuario || !correo || !secreto) {
@@ -46,6 +48,8 @@ export const crearUsuario = async (req, res) => {
       descripcion,
       ubicacion,
       telefono,
+      publicaciones,
+      productos
     });
 
     // Si se subió una foto de perfil, asignarla al usuario
@@ -90,7 +94,6 @@ export const inicioSesion = async (req, res) => {
   }
 };
 
-
 export const obtenerUsuarios = async (req, res) => {
   const {page = 1, limit = 99, ...query} = req.query;
 
@@ -110,6 +113,8 @@ export const obtenerUsuarios = async (req, res) => {
       const [usuarios, total] = await Promise.all([
           Usuarios.find(filter)
               .populate("animales", "nombre especie raza estadoSalud") // Mostrar solo campos necesarios
+              .populate("publicaciones", "titulo resumen fechaRegistro")
+              .populate("productos", "nombre descripcion precio")
               .skip((pageNumber - 1) * limitNumber)
               .limit(limitNumber),
           Usuarios.countDocuments(filter),

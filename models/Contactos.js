@@ -2,7 +2,7 @@ import { Schema, model } from "mongoose";
 const currentDate = new Date();
 
 const animalesSchema = new Schema({
-  nombre: { type: Schema.Types.ObjectId, ref: "Usuario", required: true },
+  nombre: { type: String, required: true },
   asunto: { type: String, required: true },
   mensaje: { type: String, required: true },
   fechaRegistro: {

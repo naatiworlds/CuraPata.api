@@ -29,6 +29,11 @@ export const crearPublicacion = async (req, res) => {
       revisada,
     });
     await publicacion.save();
+
+    // Ahora, agregar la publicación al array de publicaciones del usuario
+    usuario.publicaciones.push(publicacion._id);
+
+    await usuario.save();
     res.json({ message: "Publicación registrada con éxito", publicacion });
   } catch (error) {
     res.status(500).json({

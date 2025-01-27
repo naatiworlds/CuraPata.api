@@ -11,10 +11,7 @@ export const crearContacto = async (req, res) => {
   }
 
   try {
-    const usuario = await Usuarios.findById(nombre);
-    if (!usuario) {
-      return res.status(404).json({ error: "Usuario no encontrado" });
-    }
+    
     // Crear instancia del modelo
     const contacto = new Contactos({
       nombre,

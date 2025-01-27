@@ -21,9 +21,21 @@ const userSchema = new Schema({
   fotoPerfil: {
     type: String,
     required: false,
-    default: "",
     default: path.join("uploads", "profile.jpg"),
   },
+  publicaciones: {
+    type: [Schema.Types.ObjectId],
+    ref: "Publicaciones",
+    required: false,
+    default: [],
+  },
+  productos: {
+    type: [Schema.Types.ObjectId],
+    ref: "Productos",
+    required: false,
+    default: [],
+  },
+
   fechaRegistro: {
     type: String,
     required: true,
