@@ -1,6 +1,7 @@
 import Publicaciones from "../models/Publicaciones.js";
 import Usuarios from "../models/Usuarios.js";
 import mongoose from "mongoose";
+import path from "path";
 
 export const crearPublicacion = async (req, res) => {
   const { autor, titulo, subtitulo, resumen, mensaje, categoria, revisada } =
@@ -74,11 +75,11 @@ export const obtenerPublicaciones = async (req, res) => {
       total,
       page: pageNumber,
       limit: limitNumber,
-      contactos: publicaciones,
+      publicaciones: publicaciones,
     });
   } catch (error) {
     res.status(500).json({
-      error: "Error al obtener los contactos",
+      error: "Error al obtener los publicacion",
       details: error.message,
     });
   }
@@ -90,25 +91,28 @@ export const editarPublicacion = async (req, res) => {
   if (!id) {
     return res
       .status(400)
-      .json({ error: "El ID es requerido para actualizar una publicación" });
+      .json({ error: "El ID es requerido para editar un usuario" });
   }
 
   try {
-    const publicacionActualizada = await Publicaciones.findByIdAndUpdate(
-      id,
-      req.body,
-      { new: true }
-    );
-    if (!publicacionActualizada) {
+    const publicacion = await Publicaciones.findById(id);
+    if (!publicacion) {
       return res.status(404).json({ error: "Publicación no encontrada" });
     }
-    res.json({
-      message: "Publicación actualizada con éxito",
-      publicacion: publicacionActualizada,
-    });
+    // Buscar y actualizar la publicacion por ID
+    if (req.file) {
+      const fotoPublicacionUrl = path.join("uploads", req.file.filename);
+      publicacion.fotoPublicacion = fotoPublicacionUrl;
+      await publicacion.save();
+    }
+    const publicacionActualizado = await Publicaciones.findByIdAndUpdate(id, req.body, {
+        new: true,
+      }
+    );
+    res.json({ message: "Publicacion actualizado con éxito", publicacionActualizado });
   } catch (error) {
     res.status(500).json({
-      error: "Error al actualizar la publicación",
+      error: "Error al editar la publicacion",
       details: error.message,
     });
   }

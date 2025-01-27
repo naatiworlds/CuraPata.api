@@ -1,4 +1,5 @@
 import { Schema, model } from "mongoose";
+import path from "path"
 
 const currentDate = new Date(); // Definición correcta de currentDate
 
@@ -7,13 +8,17 @@ const userSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: "Usuario",
     required: false,
-    default: "",
   },
   titulo: { type: String, required: false, default: "" },
   subtitulo: { type: String, required: false, default: "" },
   resumen: { type: String, required: false, default: "" },
   mensaje: { type: String, required: false, default: "" },
   categoria: { type: String, required: false, default: "" },
+  fotoPublicacion: {
+      type: String,
+      required: false,
+      default: path.join("uploads", "profile.jpg"),
+    },
   fechaRegistro: {
     type: String,
     required: true,

@@ -3,7 +3,6 @@ import Usuarios from "../models/Usuarios.js";
 import bcrypt from "bcryptjs"; // Corregir el nombre del paquete bcrypt
 import path from "path";
 
-
 export const crearUsuario = async (req, res) => {
   const {
     nombreUsuario,
@@ -16,7 +15,7 @@ export const crearUsuario = async (req, res) => {
     ubicacion,
     telefono,
     publicaciones,
-    productos
+    productos,
   } = req.body;
   // Validación de campos
   if (!nombreUsuario || !correo || !secreto) {
@@ -49,17 +48,15 @@ export const crearUsuario = async (req, res) => {
       ubicacion,
       telefono,
       publicaciones,
-      productos
+      productos,
     });
-
-    // Si se subió una foto de perfil, asignarla al usuario
-    
-
     // Guardar el usuario
     await user.save();
     res.json({ message: "Usuario registrado con éxito", user });
   } catch (error) {
-    res.status(500).json({ error: "Error al agregar el usuario", details: error.message });
+    res
+      .status(500)
+      .json({ error: "Error al agregar el usuario", details: error.message });
   }
 };
 
@@ -92,99 +89,95 @@ export const inicioSesion = async (req, res) => {
 };
 
 export const obtenerUsuarios = async (req, res) => {
-  const {page = 1, limit = 99, ...query} = req.query;
+  const { page = 1, limit = 99, ...query } = req.query;
 
   try {
-      const pageNumber = Math.max(1, parseInt(page, 10));
-      const limitNumber = Math.max(1, parseInt(limit, 10));
+    const pageNumber = Math.max(1, parseInt(page, 10));
+    const limitNumber = Math.max(1, parseInt(limit, 10));
 
-      // Crear filtro dinámico
-      const filter = Object.entries(query).reduce((acc, [key, value]) => {
-          if (value !== undefined && value !== null) {
-              acc[key] = typeof value === "string" ? {$regex: value, $options: "i"} : value;
-          }
-          return acc;
-      }, {});
+    // Crear filtro dinámico
+    const filter = Object.entries(query).reduce((acc, [key, value]) => {
+      if (value !== undefined && value !== null) {
+        acc[key] =
+          typeof value === "string" ? { $regex: value, $options: "i" } : value;
+      }
+      return acc;
+    }, {});
 
-      // Buscar usuarios y popular el campo animales
-      const [usuarios, total] = await Promise.all([
-          Usuarios.find(filter)
-              .populate("animales", "nombre especie raza estadoSalud") // Mostrar solo campos necesarios
-              .populate("publicaciones", "titulo resumen fechaRegistro")
-              .populate("productos", "nombre descripcion precio")
-              .skip((pageNumber - 1) * limitNumber)
-              .limit(limitNumber),
-          Usuarios.countDocuments(filter),
-      ]);
+    // Buscar usuarios y popular el campo animales
+    const [usuarios, total] = await Promise.all([
+      Usuarios.find(filter)
+        .populate("animales", "nombre especie raza estadoSalud") // Mostrar solo campos necesarios
+        .populate("publicaciones", "titulo resumen fechaRegistro")
+        .populate("productos", "nombre descripcion precio")
+        .skip((pageNumber - 1) * limitNumber)
+        .limit(limitNumber),
+      Usuarios.countDocuments(filter),
+    ]);
 
-      res.json({total, page: pageNumber, limit: limitNumber, usuarios});
+    res.json({ total, page: pageNumber, limit: limitNumber, usuarios });
   } catch (error) {
-      res.status(500).json({error: "Error al obtener los usuarios", details: error.message});
+    res
+      .status(500)
+      .json({ error: "Error al obtener los usuarios", details: error.message });
   }
 };
 
 export const obtenerUsuarioPorNombre = async (req, res) => {
-  const {nombreUsuario} = req.params;
+  const { nombreUsuario } = req.params;
 
   if (!nombreUsuario) {
-      return res.status(400).json({error: "El nombre de usuario es requerido"});
+    return res.status(400).json({ error: "El nombre de usuario es requerido" });
   }
 
   try {
-      const usuario = await Usuarios.findOne({nombreUsuario}).populate(
-          "animales",
-          "nombre especie estadoSalud"
-      );
+    const usuario = await Usuarios.findOne({ nombreUsuario }).populate(
+      "animales",
+      "nombre especie estadoSalud"
+    );
 
-      if (!usuario) {
-          return res.status(404).json({error: "Usuario no encontrado"});
-      }
+    if (!usuario) {
+      return res.status(404).json({ error: "Usuario no encontrado" });
+    }
 
-      res.json(usuario);
+    res.json(usuario);
   } catch (error) {
-      res.status(500).json({error: "Error al buscar el usuario", details: error.message});
+    res
+      .status(500)
+      .json({ error: "Error al buscar el usuario", details: error.message });
   }
 };
-
-
 
 export const editarUsuario = async (req, res) => {
   const { id } = req.params;
 
   if (!id) {
-    return res.status(400).json({ error: 'El ID es requerido para editar un usuario' });
+    return res
+      .status(400)
+      .json({ error: "El ID es requerido para editar un usuario" });
   }
 
   try {
-    // Buscar el usuario por ID
     const usuario = await Usuarios.findById(id);
-    
     if (!usuario) {
-      return res.status(404).json({ error: 'Usuario no encontrado' });
+      return res.status(404).json({ error: "Usuario no encontrado" });
     }
-
-    // Si hay un archivo (foto de perfil), actualizar la URL de la foto
+    // Buscar y actualizar el usuario por ID
     if (req.file) {
-      const fotoPerfilUrl = path.join('uploads', 'usuarios', req.file.filename); // Asumimos que la ruta es la correcta
+      const fotoPerfilUrl = path.join("uploads", req.file.filename);
       usuario.fotoPerfil = fotoPerfilUrl;
+      await usuario.save();
     }
-
-    // Actualizar el resto de los campos
-    const { nombreUsuario, correo, telefono, descripcion } = req.body;
-    usuario.nombreUsuario = nombreUsuario || usuario.nombreUsuario;
-    usuario.correo = correo || usuario.correo;
-    usuario.telefono = telefono || usuario.telefono;
-    usuario.descripcion = descripcion || usuario.descripcion;
-
-    // Guardar los cambios en la base de datos
-    await usuario.save();
-
-    res.json({ message: 'Usuario actualizado con éxito', usuarioActualizado: usuario });
+    const usuarioActualizado = await Usuarios.findByIdAndUpdate(id, req.body, {
+      new: true,
+    });
+    res.json({ message: "Usuario actualizado con éxito", usuarioActualizado });
   } catch (error) {
-    res.status(500).json({ error: 'Error al editar el usuario', details: error.message });
+    res
+      .status(500)
+      .json({ error: "Error al editar el usuario", details: error.message });
   }
 };
-
 
 export const eliminarUsuario = async (req, res) => {
   const { id } = req.params; // Corregir la asignación
@@ -213,7 +206,9 @@ export const subirFotoPerfil = async (req, res) => {
   }
 
   if (!req.file) {
-    return res.status(400).json({ error: "Se requiere una imagen para la foto de perfil" });
+    return res
+      .status(400)
+      .json({ error: "Se requiere una imagen para la foto de perfil" });
   }
 
   try {
@@ -227,8 +222,14 @@ export const subirFotoPerfil = async (req, res) => {
     usuario.fotoPerfil = fotoPerfilUrl;
     await usuario.save();
 
-    res.json({ message: "Foto de perfil actualizada con éxito", fotoPerfil: fotoPerfilUrl });
+    res.json({
+      message: "Foto de perfil actualizada con éxito",
+      fotoPerfil: fotoPerfilUrl,
+    });
   } catch (error) {
-    res.status(500).json({ error: "Error al actualizar la foto de perfil", details: error.message });
+    res.status(500).json({
+      error: "Error al actualizar la foto de perfil",
+      details: error.message,
+    });
   }
 };
