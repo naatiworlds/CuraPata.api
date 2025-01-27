@@ -9,16 +9,16 @@ import {
 
 const router = Router();
 
-// Crear usuario
+// Crear publicacion
 router.post('/', crearPublicacion);
 
-// Obtener todos los usuarios
+// Obtener todos los publicacions
 router.get('/', obtenerPublicaciones);
 
-// Editar usuario por ID
+// Editar publicacion por ID
 router.put('/:id', editarPublicacion);
 
-// Eliminar usuario (se recomienda especificar el ID)
+// Eliminar publicacion (se recomienda especificar el ID)
 router.delete('/:id', eliminarPublicacion);
 
 export default router;

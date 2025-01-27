@@ -6,6 +6,7 @@ import usuarioRoutes from "./routes/usuarioRoutes.js";
 import animalesRoutes from "./routes/animalesRoutes.js";
 import contactosRoutes from "./routes/contactosRoutes.js"
 import publicacionesRoutes from "./routes/publicacionesRoutes.js"
+import productorRoutes from "./routes/productosRoutes.js"
 // Configuración de variables de entorno
 dotenv.config();
 
@@ -28,6 +29,7 @@ app.use("/usuarios", usuarioRoutes);
 app.use("/animales", animalesRoutes);
 app.use("/contactos", contactosRoutes);
 app.use("/publicaciones", publicacionesRoutes);
+app.use("/productos", productorRoutes);
 
 // Configuración del puerto
 const PORT = process.env.PORT || 3000;
