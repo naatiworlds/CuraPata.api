@@ -162,15 +162,18 @@ export const editarUsuario = async (req, res) => {
     if (!usuario) {
       return res.status(404).json({ error: "Usuario no encontrado" });
     }
-    // Buscar y actualizar el usuario por ID
+
     if (req.file) {
-      const fotoPerfilUrl = path.join("uploads", req.file.filename);
+      const baseUrl = "https://curapata-api.onrender.com"; // Cambia esta URL según tu dominio
+      const fotoPerfilUrl = `${baseUrl}/uploads/usuarios/${req.file.filename}`;
       usuario.fotoPerfil = fotoPerfilUrl;
       await usuario.save();
     }
+
     const usuarioActualizado = await Usuarios.findByIdAndUpdate(id, req.body, {
       new: true,
     });
+
     res.json({ message: "Usuario actualizado con éxito", usuarioActualizado });
   } catch (error) {
     res

@@ -1,6 +1,7 @@
 import { Schema, model } from "mongoose";
 import path from "path"
 
+const baseUrl = "https://curapata-api.onrender.com"; // URL base de tu API
 const currentDate = new Date(); // Definición correcta de currentDate
 
 const userSchema = new Schema({
@@ -17,7 +18,7 @@ const userSchema = new Schema({
   fotoPublicacion: {
       type: String,
       required: false,
-      default: path.join("uploads", "profile.jpg"),
+      default: "",
     },
   fechaRegistro: {
     type: String,

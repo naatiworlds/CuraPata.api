@@ -1,6 +1,6 @@
 import { Schema, model } from "mongoose";
-import path from "path";
 
+const baseUrl = "https://curapata-api.onrender.com"; // URL base de tu API
 const currentDate = new Date(); // Definición correcta de currentDate
 
 const userSchema = new Schema({
@@ -13,7 +13,7 @@ const userSchema = new Schema({
     ref: "Animales",
     required: false,
     default: [],
-  }, // Definir tipo explícito para el array
+  },
   rol: { type: String, required: false, default: "usuario" },
   descripcion: { type: String, required: false, default: "" },
   ubicacion: { type: String, required: false, default: "" },
@@ -21,7 +21,7 @@ const userSchema = new Schema({
   fotoPerfil: {
     type: String,
     required: false,
-    default: path.join("uploads", "profile.jpg"),
+    default: () => `${baseUrl}/uploads/profile.jpg`, // Generar la URL completa como valor predeterminado
   },
   publicaciones: {
     type: [Schema.Types.ObjectId],
@@ -35,7 +35,6 @@ const userSchema = new Schema({
     required: false,
     default: [],
   },
-
   fechaRegistro: {
     type: String,
     required: true,

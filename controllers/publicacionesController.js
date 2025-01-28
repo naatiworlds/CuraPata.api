@@ -101,7 +101,8 @@ export const editarPublicacion = async (req, res) => {
     }
     // Buscar y actualizar la publicacion por ID
     if (req.file) {
-      const fotoPublicacionUrl = path.join("uploads", req.file.filename);
+      const baseUrl = "https://curapata-api.onrender.com"; // Cambia esta URL según tu dominio
+      const fotoPublicacionUrl = `${baseUrl}/uploads/publicaciones/${req.file.filename}`;
       publicacion.fotoPublicacion = fotoPublicacionUrl;
       await publicacion.save();
     }
