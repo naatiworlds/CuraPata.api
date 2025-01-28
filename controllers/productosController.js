@@ -1,5 +1,7 @@
 import Productos from "../models/Productos.js";
 import Usuarios from "../models/Usuarios.js";
+import path from "path";
+import mongoose from "mongoose";
 
 export const crearProducto = async (req, res) => {
   const { vendedor, nombre, descripcion, precio, moneda, stock, categoria } =

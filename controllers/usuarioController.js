@@ -200,39 +200,3 @@ export const eliminarUsuario = async (req, res) => {
       .json({ error: "Error al borrar el usuario", details: error.message });
   }
 };
-
-export const subirFotoPerfil = async (req, res) => {
-  const { id } = req.params;
-
-  if (!id) {
-    return res.status(400).json({ error: "El ID del usuario es requerido" });
-  }
-
-  if (!req.file) {
-    return res
-      .status(400)
-      .json({ error: "Se requiere una imagen para la foto de perfil" });
-  }
-
-  try {
-    const usuario = await Usuarios.findById(id);
-    if (!usuario) {
-      return res.status(404).json({ error: "Usuario no encontrado" });
-    }
-
-    // Actualizar el campo de la foto de perfil con la URL de la imagen
-    const fotoPerfilUrl = path.join("uploads", req.file.filename);
-    usuario.fotoPerfil = fotoPerfilUrl;
-    await usuario.save();
-
-    res.json({
-      message: "Foto de perfil actualizada con éxito",
-      fotoPerfil: fotoPerfilUrl,
-    });
-  } catch (error) {
-    res.status(500).json({
-      error: "Error al actualizar la foto de perfil",
-      details: error.message,
-    });
-  }
-};

@@ -144,26 +144,3 @@ export const eliminarPublicacion = async (req, res) => {
     });
   }
 };
-
-export const obtenerPublicacion = async (req, res) => {
-  const { id } = req.params;
-
-  if (!id) {
-    return res
-      .status(400)
-      .json({ error: "El ID es requerido para buscar una publicación" });
-  }
-
-  try {
-    const publicacion = await Publicaciones.findById(id);
-    if (!publicacion) {
-      return res.status(404).json({ error: "Publicación no encontrada" });
-    }
-    res.json(publicacion);
-  } catch (error) {
-    res.status(500).json({
-      error: "Error al buscar la publicación",
-      details: error.message,
-    });
-  }
-};
