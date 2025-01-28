@@ -12,6 +12,11 @@ const animalesSchema = new Schema({
     ref: "Usuario",
     required: true,
   },
+  fotoAnimal: {
+    type: String,
+    required: false,
+    default: ""
+  },
   fechaRegistro: {
     type: String,
     required: true,

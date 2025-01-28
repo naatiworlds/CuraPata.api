@@ -6,6 +6,7 @@ import {
     editarProducto,
     eliminarProducto,
 } from '../controllers/productosController.js';
+import upload from '../middlewares/upload.js';
 
 const router = Router();
 
@@ -16,7 +17,7 @@ router.post('/', crearProducto);
 router.get('/', obtenerProductos);
 
 // Editar producto por ID
-router.put('/:id', editarProducto);
+router.put('/:id', upload("producto").single("fotoProducto"), editarProducto);
 
 // Eliminar producto 
 router.delete('/:id', eliminarProducto);

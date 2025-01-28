@@ -83,25 +83,6 @@ export const obtenerAnimales = async (req, res) => {
   }
 };
 
-// export const obtenerAnimalesPorDuenio = async (req, res) => {
-//     const {nombre} = req.params;
-//     if (!nombre) {
-//         return res.status(400).json({
-//             error: "El nombre de usuario es requerido para buscar un usuario",
-//         });
-//     }
-
-//     try {
-//         // Buscar el usuario por nombre
-//         const animal = await Animales.find({duenio: nombre});
-//         res.json(animal);
-//     } catch (error) {
-//         res
-//             .status(500)
-//             .json({error: "Error al buscar el usuario", details: error.message});
-//     }
-// };
-
 export const editarAnimal = async (req, res) => {
   const { id } = req.params;
 
@@ -113,6 +94,16 @@ export const editarAnimal = async (req, res) => {
   }
 
   try {
+    const animal = await Animales.findById(id);
+        if (!animal) {
+          return res.status(404).json({ error: "Usuario no encontrado" });
+        }
+        if (req.file) {
+          const baseUrl = "https://curapata-api.onrender.com"; // Cambia esta URL según tu dominio
+          const fotoAnimalUrl = `${baseUrl}/uploads/animales/${req.file.filename}`;
+          animal.fotoAnimal = fotoAnimalUrl;
+          await animal.save();
+        }
     // Buscar y actualizar el animal por nombre
     const animalActualizado = await Animales.findByIdAndUpdate(id, req.body, {
       new: true,
@@ -155,20 +146,3 @@ export const eliminarAnimal = async (req, res) => {
   }
 };
 
-export const obtenerAnimal = async (req, res) => {
-  const { id } = req.params;
-  if (!id) {
-    return res
-      .status(400)
-      .json({ error: "El ID es requerido para buscar un animal" });
-  }
-
-  try {
-    const animal = await Animales.findById(id);
-    res.json(animal);
-  } catch (error) {
-    res
-      .status(500)
-      .json({ error: "Error al buscar el animal", details: error.message });
-  }
-};

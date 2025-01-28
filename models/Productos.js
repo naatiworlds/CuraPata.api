@@ -15,6 +15,11 @@ const userSchema = new Schema({
   moneda: { type: String, required: false, default: "" },
   stock: { type: String, required: false, default: "" },
   categoria: { type: String, required: false, default: "" },
+  fotoProducto: {
+    type: String,
+    required: false,
+    default: ""
+  },
   fechaRegistro: {
     type: String,
     required: true,

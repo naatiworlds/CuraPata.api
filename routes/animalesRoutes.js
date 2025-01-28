@@ -6,6 +6,7 @@ import {
   obtenerAnimales,
   eliminarAnimal,
 } from "../controllers/animalesController.js";
+import upload from '../middlewares/upload.js';
 
 const router = Router();
 
@@ -16,7 +17,7 @@ router.post("/", crearAnimal);
 router.get("/", obtenerAnimales);
 
 // Editar animales por id
-router.put("/:id", editarAnimal);
+router.put("/:id", upload("animal").single("fotoAnimal"), editarAnimal);
 
 // Borrar animal
 router.delete("/:id", eliminarAnimal);

@@ -77,34 +77,6 @@ export const obtenerProductos = async (req, res) => {
   }
 };
 
-export const obtenerProducto = async (req, res) => {
-  const { id } = req.params;
-
-  if (!id) {
-    return res
-      .status(400)
-      .json({ error: "El ID es requerido para buscar un producto" });
-  }
-
-  try {
-    const producto = await Productos.findById(id).populate(
-      "vendedor",
-      "nombreUsuario correo"
-    );
-
-    if (!producto) {
-      return res.status(404).json({ error: "Producto no encontrado" });
-    }
-
-    res.json(producto);
-  } catch (error) {
-    res.status(500).json({
-      error: "Error al buscar el producto",
-      details: error.message,
-    });
-  }
-};
-
 export const editarProducto = async (req, res) => {
   const { id } = req.params;
 
@@ -115,6 +87,16 @@ export const editarProducto = async (req, res) => {
   }
 
   try {
+    const producto = await Productos.findById(id);
+    if (!producto) {
+      return res.status(404).json({ error: "Usuario no encontrado" });
+    }
+    if (req.file) {
+      const baseUrl = "https://curapata-api.onrender.com"; // Cambia esta URL según tu dominio
+      const fotoProductoUrl = `${baseUrl}/uploads/productos/${req.file.filename}`;
+      producto.fotoProducto = fotoProductoUrl;
+      await producto.save();
+    }
     const productoActualizado = await Productos.findByIdAndUpdate(
       id,
       req.body,
