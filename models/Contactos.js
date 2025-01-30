@@ -7,6 +7,7 @@ const animalesSchema = new Schema({
   telefono: { type: String, required: true },
   asunto: { type: String, required: true },
   mensaje: { type: String, required: true },
+  revisada: { type: Boolean, required: false, default: false },
   fechaRegistro: {
     type: String,
     required: true,

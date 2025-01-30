@@ -6,12 +6,11 @@ export const crearContacto = async (req, res) => {
   const { nombre, correo, telefono, asunto, mensaje } = req.body;
 
   // Validación de campos
-  if (!nombre ||!correo ||!telefono || !asunto || !mensaje) {
+  if (!nombre || !correo || !telefono || !asunto || !mensaje) {
     return res.status(400).json({ error: "Todos los campos son requeridos" });
   }
 
   try {
-    
     // Crear instancia del modelo
     const contacto = new Contactos({
       nombre,
@@ -40,10 +39,14 @@ export const obtenerContactos = async (req, res) => {
     // Crear filtro dinámico
     const filter = Object.entries(query).reduce((acc, [key, value]) => {
       if (value !== undefined && value !== null) {
-        acc[key] =
-          key === "_id" && mongoose.Types.ObjectId.isValid(value) // Verificar validez de ObjectId
-            ? value
-            : { $regex: value, $options: "i" }; // Aplicar regex para otros campos
+        if (key === "_id" && mongoose.Types.ObjectId.isValid(value)) {
+          acc[key] = value; // Filtrar por ObjectId
+        } else if (key === "revisada") {
+          // Convertir el valor a booleano
+          acc[key] = value === "true";
+        } else {
+          acc[key] = { $regex: value, $options: "i" }; // Filtro de texto
+        }
       }
       return acc;
     }, {});
