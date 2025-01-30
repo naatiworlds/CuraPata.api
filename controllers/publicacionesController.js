@@ -53,14 +53,19 @@ export const obtenerPublicaciones = async (req, res) => {
 
     // Crear filtro dinámico
     const filter = Object.entries(query).reduce((acc, [key, value]) => {
-      if (value !== undefined && value !== null) {
-        acc[key] =
-          key === "_id" && mongoose.Types.ObjectId.isValid(value) // Verificar validez de ObjectId
-            ? value
-            : { $regex: value, $options: "i" }; // Aplicar regex para otros campos
-      }
-      return acc;
-    }, {});
+          if (value !== undefined && value !== null) {
+            if (key === "_id" && mongoose.Types.ObjectId.isValid(value)) {
+              acc[key] = value; // Filtrar por ObjectId
+            } else if (key === "revisada") {
+              // Convertir el valor a booleano
+              acc[key] = value === "true"; 
+            } else {
+              acc[key] = { $regex: value, $options: "i" }; // Filtro de texto
+            }
+          }
+          return acc;
+        }, {});
+    
 
     // Consultar base de datos con paginación y conteo total
     const [publicaciones, total] = await Promise.all([

@@ -6,7 +6,7 @@ export const crearContacto = async (req, res) => {
   const { nombre, correo, telefono, asunto, mensaje } = req.body;
 
   // Validación de campos
-  if (!nombre || !asunto || !mensaje) {
+  if (!nombre ||!correo ||!telefono || !asunto || !mensaje) {
     return res.status(400).json({ error: "Todos los campos son requeridos" });
   }
 
@@ -15,6 +15,8 @@ export const crearContacto = async (req, res) => {
     // Crear instancia del modelo
     const contacto = new Contactos({
       nombre,
+      correo,
+      telefono,
       asunto,
       mensaje,
     });
@@ -49,7 +51,6 @@ export const obtenerContactos = async (req, res) => {
     // Consultar base de datos con paginación y conteo total
     const [contactos, total] = await Promise.all([
       Contactos.find(filter)
-        .populate("nombre", "nombreUsuario correo telefono") // Mostrar solo campos relevantes
         .skip((pageNumber - 1) * limitNumber)
         .limit(limitNumber),
       Contactos.countDocuments(filter),

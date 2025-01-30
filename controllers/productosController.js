@@ -54,10 +54,14 @@ export const obtenerProductos = async (req, res) => {
     // Crear filtro dinámico
     const filter = Object.entries(query).reduce((acc, [key, value]) => {
       if (value !== undefined && value !== null) {
-        acc[key] =
-          key === "_id" && mongoose.Types.ObjectId.isValid(value) // Validar ObjectId
-            ? value
-            : { $regex: value, $options: "i" }; // Filtro de texto
+        if (key === "_id" && mongoose.Types.ObjectId.isValid(value)) {
+          acc[key] = value; // Filtrar por ObjectId
+        } else if (key === "revisada") {
+          // Convertir el valor a booleano
+          acc[key] = value === "true"; 
+        } else {
+          acc[key] = { $regex: value, $options: "i" }; // Filtro de texto
+        }
       }
       return acc;
     }, {});

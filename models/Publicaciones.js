@@ -1,5 +1,5 @@
 import { Schema, model } from "mongoose";
-import path from "path"
+import path from "path";
 
 const baseUrl = "https://curapata-api.onrender.com"; // URL base de tu API
 const currentDate = new Date(); // Definición correcta de currentDate
@@ -16,14 +16,14 @@ const userSchema = new Schema({
   mensaje: { type: String, required: false, default: "" },
   categoria: { type: String, required: false, default: "" },
   fotoPublicacion: {
-      type: String,
-      required: false,
-      default: "",
-    },
+    type: String,
+    required: false,
+    default: "",
+  },
   fechaRegistro: {
     type: String,
     required: true,
-    default: () => currentDate.toLocaleDateString(), // Usar una función para valores dinámicos por documento
+    default: () => currentDate.toLocaleDateString(),
   },
   revisada: { type: Boolean, required: false, default: false },
 });
