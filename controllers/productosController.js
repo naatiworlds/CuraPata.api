@@ -29,7 +29,7 @@ export const crearProducto = async (req, res) => {
     }
 
     // Crear una nueva instancia del producto
-    const producto = new Productos({
+    const nuevoProducto = new Productos({
       vendedor,
       nombre,
       descripcion,
@@ -39,25 +39,25 @@ export const crearProducto = async (req, res) => {
       categoria,
     });
 
-    await producto.save();
+    await nuevoProducto.save();
 
     // Si hay una imagen temporal, actualizar con el ID real
     if (tempFilename) {
       const nuevaUrl = await actualizarImagenConId(
         "producto",
-        producto._id,
+        nuevoProducto._id,
         tempFilename
       );
       if (nuevaUrl) {
-        producto.fotoPublicacion = nuevaUrl;
-        await producto.save();
+        nuevoProducto.fotoProducto = nuevaUrl;
+        await nuevoProducto.save();
       }
     }
     // Ahora, agregar la publicación al array de publicaciones del usuario
-    usuario.productos.push(producto._id);
+    usuario.productos.push(nuevoProducto._id);
     await usuario.save();
 
-    res.json({ message: "Producto creado con éxito", producto });
+    res.json({ message: "Producto creado con éxito", producto: nuevoProducto });
   } catch (error) {
     res
       .status(500)
