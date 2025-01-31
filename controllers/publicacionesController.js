@@ -6,7 +6,15 @@ import path from "path";
 import upload, { actualizarImagenConId } from "../middlewares/upload.js";
 
 export const crearPublicacion = async (req, res) => {
-  const { autor, titulo, subtitulo, resumen, mensaje, categoria, revisada, tempFilename } = req.body;
+  const {
+    autor,
+    titulo,
+    subtitulo,
+    resumen,
+    mensaje,
+    categoria,
+    tempFilename,
+  } = req.body;
 
   if (!autor || !titulo || !subtitulo || !resumen || !mensaje || !categoria) {
     return res.status(400).json({ error: "Todos los campos son obligatorios" });
@@ -25,14 +33,17 @@ export const crearPublicacion = async (req, res) => {
       resumen,
       mensaje,
       categoria,
-      revisada,
     });
 
     await nuevaPublicacion.save();
 
     // Si hay una imagen temporal, actualizar con el ID real
     if (tempFilename) {
-      const nuevaUrl = await actualizarImagenConId("publicacion", nuevaPublicacion._id, tempFilename);
+      const nuevaUrl = await actualizarImagenConId(
+        "publicacion",
+        nuevaPublicacion._id,
+        tempFilename
+      );
       if (nuevaUrl) {
         nuevaPublicacion.fotoPublicacion = nuevaUrl;
         await nuevaPublicacion.save();
@@ -42,13 +53,19 @@ export const crearPublicacion = async (req, res) => {
     usuario.publicaciones.push(nuevaPublicacion._id);
     await usuario.save();
 
-    res.json({ message: "Publicación creada con éxito", publicacion: nuevaPublicacion });
+    res.json({
+      message: "Publicación creada con éxito",
+      publicacion: nuevaPublicacion,
+    });
   } catch (error) {
-    res.status(500).json({ error: "Error al registrar la publicación", details: error.message });
+    res
+      .status(500)
+      .json({
+        error: "Error al registrar la publicación",
+        details: error.message,
+      });
   }
 };
-
-
 
 export const obtenerPublicaciones = async (req, res) => {
   const { page = 1, limit = 99, ...query } = req.query;
@@ -59,19 +76,18 @@ export const obtenerPublicaciones = async (req, res) => {
 
     // Crear filtro dinámico
     const filter = Object.entries(query).reduce((acc, [key, value]) => {
-          if (value !== undefined && value !== null) {
-            if (key === "_id" && mongoose.Types.ObjectId.isValid(value)) {
-              acc[key] = value; // Filtrar por ObjectId
-            } else if (key === "revisada") {
-              // Convertir el valor a booleano
-              acc[key] = value === "true"; 
-            } else {
-              acc[key] = { $regex: value, $options: "i" }; // Filtro de texto
-            }
-          }
-          return acc;
-        }, {});
-    
+      if (value !== undefined && value !== null) {
+        if (key === "_id" && mongoose.Types.ObjectId.isValid(value)) {
+          acc[key] = value; // Filtrar por ObjectId
+        } else if (key === "revisada") {
+          // Convertir el valor a booleano
+          acc[key] = value === "true";
+        } else {
+          acc[key] = { $regex: value, $options: "i" }; // Filtro de texto
+        }
+      }
+      return acc;
+    }, {});
 
     // Consultar base de datos con paginación y conteo total
     const [publicaciones, total] = await Promise.all([
@@ -117,11 +133,17 @@ export const editarPublicacion = async (req, res) => {
       publicacion.fotoPublicacion = fotoPublicacionUrl;
       await publicacion.save();
     }
-    const publicacionActualizado = await Publicaciones.findByIdAndUpdate(id, req.body, {
+    const publicacionActualizado = await Publicaciones.findByIdAndUpdate(
+      id,
+      req.body,
+      {
         new: true,
       }
     );
-    res.json({ message: "Publicacion actualizado con éxito", publicacionActualizado });
+    res.json({
+      message: "Publicacion actualizado con éxito",
+      publicacionActualizado,
+    });
   } catch (error) {
     res.status(500).json({
       error: "Error al editar la publicacion",

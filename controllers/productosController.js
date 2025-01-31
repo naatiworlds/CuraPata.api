@@ -4,7 +4,16 @@ import path from "path";
 import mongoose from "mongoose";
 
 export const crearProducto = async (req, res) => {
-  const { vendedor, nombre, descripcion, precio, moneda, stock, categoria } =
+  const { 
+    vendedor, 
+    nombre, 
+    descripcion, 
+    precio, 
+    moneda, 
+    stock, 
+    categoria,
+    tempFilename
+   } =
     req.body;
 
   // Validación de campos requeridos
@@ -32,6 +41,18 @@ export const crearProducto = async (req, res) => {
 
     await producto.save();
 
+    // Si hay una imagen temporal, actualizar con el ID real
+    if (tempFilename) {
+      const nuevaUrl = await actualizarImagenConId(
+        "producto",
+        producto._id,
+        tempFilename
+      );
+      if (nuevaUrl) {
+        nuevaPublicacion.fotoPublicacion = nuevaUrl;
+        await nuevaPublicacion.save();
+      }
+    }
     // Ahora, agregar la publicación al array de publicaciones del usuario
     usuario.productos.push(producto._id);
     await usuario.save();
@@ -58,7 +79,7 @@ export const obtenerProductos = async (req, res) => {
           acc[key] = value; // Filtrar por ObjectId
         } else if (key === "revisada") {
           // Convertir el valor a booleano
-          acc[key] = value === "true"; 
+          acc[key] = value === "true";
         } else {
           acc[key] = { $regex: value, $options: "i" }; // Filtro de texto
         }
