@@ -52,7 +52,6 @@ const userSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: "Usuario",
     required: false,
-    default: "",
   },
   nombre: { type: String, required: false, default: "" },
   descripcion: { type: String, required: false, default: "" },
