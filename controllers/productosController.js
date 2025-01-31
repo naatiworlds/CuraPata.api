@@ -2,6 +2,7 @@ import Productos from "../models/Productos.js";
 import Usuarios from "../models/Usuarios.js";
 import path from "path";
 import mongoose from "mongoose";
+import { actualizarImagenConId } from "../middlewares/upload.js";
 
 export const crearProducto = async (req, res) => {
   const { 
@@ -15,7 +16,6 @@ export const crearProducto = async (req, res) => {
     tempFilename
    } =
     req.body;
-
   // Validación de campos requeridos
   if (!vendedor || !nombre || !precio || !moneda || !stock || !categoria) {
     return res.status(400).json({ error: "Todos los campos son requeridos" });
@@ -49,8 +49,8 @@ export const crearProducto = async (req, res) => {
         tempFilename
       );
       if (nuevaUrl) {
-        nuevaPublicacion.fotoPublicacion = nuevaUrl;
-        await nuevaPublicacion.save();
+        producto.fotoPublicacion = nuevaUrl;
+        await producto.save();
       }
     }
     // Ahora, agregar la publicación al array de publicaciones del usuario
