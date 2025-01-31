@@ -11,7 +11,7 @@ import upload from '../middlewares/upload.js';
 const router = Router();
 
 // Crear publicacion
-router.post('/', crearPublicacion);
+router.post('/', upload("publicacion").single("fotoPublicacion"), crearPublicacion);
 
 // Obtener todos los publicacions
 router.get('/', obtenerPublicaciones);

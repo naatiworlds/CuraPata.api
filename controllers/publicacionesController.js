@@ -3,15 +3,13 @@ import Usuarios from "../models/Usuarios.js";
 import mongoose from "mongoose";
 import path from "path";
 
-export const crearPublicacion = async (req, res) => {
-  const { autor, titulo, subtitulo, resumen, mensaje, categoria, revisada } =
-    req.body;
+import upload, { actualizarImagenConId } from "../middlewares/upload.js";
 
-  // Validación de campos obligatorios (puedes personalizar según lo requerido)
+export const crearPublicacion = async (req, res) => {
+  const { autor, titulo, subtitulo, resumen, mensaje, categoria, revisada, tempFilename } = req.body;
+
   if (!autor || !titulo || !subtitulo || !resumen || !mensaje || !categoria) {
-    return res
-      .status(400)
-      .json({ error: "El título y el mensaje son requeridos" });
+    return res.status(400).json({ error: "Todos los campos son obligatorios" });
   }
 
   try {
@@ -19,8 +17,8 @@ export const crearPublicacion = async (req, res) => {
     if (!usuario) {
       return res.status(404).json({ error: "Usuario no encontrado" });
     }
-    // Crear instancia del modelo
-    const publicacion = new Publicaciones({
+
+    const nuevaPublicacion = new Publicaciones({
       autor,
       titulo,
       subtitulo,
@@ -29,20 +27,28 @@ export const crearPublicacion = async (req, res) => {
       categoria,
       revisada,
     });
-    await publicacion.save();
 
-    // Ahora, agregar la publicación al array de publicaciones del usuario
-    usuario.publicaciones.push(publicacion._id);
+    await nuevaPublicacion.save();
 
+    // Si hay una imagen temporal, actualizar con el ID real
+    if (tempFilename) {
+      const nuevaUrl = await actualizarImagenConId("publicacion", nuevaPublicacion._id, tempFilename);
+      if (nuevaUrl) {
+        nuevaPublicacion.fotoPublicacion = nuevaUrl;
+        await nuevaPublicacion.save();
+      }
+    }
+
+    usuario.publicaciones.push(nuevaPublicacion._id);
     await usuario.save();
-    res.json({ message: "Publicación registrada con éxito", publicacion });
+
+    res.json({ message: "Publicación creada con éxito", publicacion: nuevaPublicacion });
   } catch (error) {
-    res.status(500).json({
-      error: "Error al registrar la publicación",
-      details: error.message,
-    });
+    res.status(500).json({ error: "Error al registrar la publicación", details: error.message });
   }
 };
+
+
 
 export const obtenerPublicaciones = async (req, res) => {
   const { page = 1, limit = 99, ...query } = req.query;

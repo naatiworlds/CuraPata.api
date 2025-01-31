@@ -159,11 +159,13 @@ export const editarUsuario = async (req, res) => {
 
   try {
     const usuario = await Usuarios.findById(id);
+    console.log(req.body)
     if (!usuario) {
       return res.status(404).json({ error: "Usuario no encontrado" });
     }
-
     if (req.file) {
+    console.log(req.file)
+
       const baseUrl = "https://curapata-api.onrender.com"; // Cambia esta URL según tu dominio
       const fotoPerfilUrl = `${baseUrl}/uploads/usuarios/${req.file.filename}`;
       usuario.fotoPerfil = fotoPerfilUrl;

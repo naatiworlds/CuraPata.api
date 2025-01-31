@@ -1,20 +1,19 @@
 import multer from "multer";
 import path from "path";
 import fs from "fs";
-import { fileURLToPath } from "url";  // Importar fileURLToPath desde 'url'
+import { fileURLToPath } from "url";
 import Usuarios from "../models/Usuarios.js";
 import Productos from "../models/Productos.js";
 import Animales from "../models/Animales.js";
 import Publicaciones from "../models/Publicaciones.js";
 
-// Obtener el directorio actual usando import.meta.url
-const __dirname = path.dirname(fileURLToPath(import.meta.url)); // Esto simula __dirname
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const BASE_URL = "https://curapata-api.onrender.com"; // URL base para las imágenes
 
-// Función que acepta el tipo de archivo como parámetro
 const upload = (tipoArchivo) => {
   const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-      if (!file) return cb(null, false); // Si no hay archivo, continuar sin error
+      if (!file) return cb(null, false);
       let uploadPath = "";
 
       switch (tipoArchivo) {
@@ -41,11 +40,18 @@ const upload = (tipoArchivo) => {
       cb(null, uploadPath);
     },
     filename: async (req, file, cb) => {
-      if (!file) return cb(null, false); // Continuar si no hay archivo
+      if (!file) return cb(null, false);
       try {
-        const id = req.params.id;
-        let modelo;
+        let id = req.params.id || req.body.tempId; 
 
+        if (!id) {
+          const timestamp = Date.now();
+          const tempFilename = `temp_${timestamp}${path.extname(file.originalname)}`;
+          req.body.tempFilename = tempFilename;
+          return cb(null, tempFilename);
+        }
+
+        let modelo;
         switch (tipoArchivo) {
           case "perfil":
             modelo = Usuarios;
@@ -79,5 +85,38 @@ const upload = (tipoArchivo) => {
   return multer({ storage: storage });
 };
 
+// Función para renombrar la imagen y actualizar la URL en el modelo
+export const actualizarImagenConId = async (tipoArchivo, documentoId, tempFilename) => {
+  const basePath = path.join(__dirname, "..", "uploads");
+
+  let folder = "";
+  switch (tipoArchivo) {
+    case "perfil":
+      folder = "usuarios";
+      break;
+    case "producto":
+      folder = "productos";
+      break;
+    case "animal":
+      folder = "animales";
+      break;
+    case "publicacion":
+      folder = "publicaciones";
+      break;
+    default:
+      throw new Error("Tipo de archivo no válido");
+  }
+
+  const tempPath = path.join(basePath, folder, tempFilename);
+  const newFilename = `${documentoId}${path.extname(tempFilename)}`;
+  const newPath = path.join(basePath, folder, newFilename);
+
+  if (fs.existsSync(tempPath)) {
+    fs.renameSync(tempPath, newPath); // Renombrar archivo
+    return `${BASE_URL}/uploads/${folder}/${newFilename}`; // Retornar URL completa
+  }
+
+  return null;
+};
 
 export default upload;

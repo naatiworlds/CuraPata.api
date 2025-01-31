@@ -9,10 +9,20 @@ import publicacionesRoutes from "./routes/publicacionesRoutes.js"
 import productorRoutes from "./routes/productosRoutes.js"
 import upload from "./middlewares/upload.js";
 import path from "path"
+
+
+import swaggerJsDoc from "swagger-jsdoc";
+import swaggerUi from "swagger-ui-express";
+import swaggerOptions from "./config/swagger.js"; // Importa bien el archivo de configuración
+
+
 // Configuración de variables de entorno
 dotenv.config();
 
 const app = express();
+
+// Configuración de Swagger
+const specs = swaggerJsDoc(swaggerOptions);
 
 // Conectar a la base de datos
 connectDB()
@@ -22,7 +32,6 @@ connectDB()
     process.exit(1);
   });
 
-// Middlewares
 app.use(cors()); // Permitir peticiones de cualquier origen
 app.use(express.json()); // Reemplaza body-parser
 
@@ -33,6 +42,8 @@ app.use("/contactos", contactosRoutes);
 app.use("/publicaciones", publicacionesRoutes);
 app.use("/productos", productorRoutes);
 app.use("/uploads", express.static(path.resolve("uploads")));
+// Habilitar Swagger UI
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
 
 // Configuración del puerto
 const PORT = process.env.PORT || 3000;
