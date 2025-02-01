@@ -77,7 +77,7 @@ const router = Router();
  */
 
 // Crear animal
-router.post("/", crearAnimal);
+router.post("/", upload("animal").single("fotoAnimal"), crearAnimal);
 
 /**
  * @swagger

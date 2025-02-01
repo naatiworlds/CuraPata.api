@@ -1,5 +1,6 @@
 import Animales from "../models/Animales.js";
 import Usuarios from "../models/Usuarios.js";
+import mongoose from "mongoose";
 
 export const crearAnimal = async (req, res) => {
   const {
@@ -9,13 +10,19 @@ export const crearAnimal = async (req, res) => {
     edad,
     estadoSalud,
     duenio,
-    perdida,
-    adoptada,
+    perdida = false,
+    adoptada = false,
+    tempFilename,
   } = req.body;
 
-  // Validación de campos
+  // Validación de campos requeridos
   if (!nombre || !especie || !raza || !edad || !estadoSalud || !duenio) {
     return res.status(400).json({ error: "Todos los campos son requeridos" });
+  }
+
+  // Validar que `duenio` sea un ObjectId válido
+  if (!mongoose.Types.ObjectId.isValid(duenio)) {
+    return res.status(400).json({ error: "ID del dueño no es válido" });
   }
 
   try {
@@ -26,7 +33,7 @@ export const crearAnimal = async (req, res) => {
     }
 
     // Crear instancia del modelo Animales
-    const animal = new Animales({
+    const nuevoAnimal = new Animales({
       nombre,
       especie,
       raza,
@@ -37,17 +44,25 @@ export const crearAnimal = async (req, res) => {
       adoptada,
     });
 
-    await animal.save();
+    await nuevoAnimal.save();
+
+    // Si hay una imagen temporal, actualizar con el ID real
+    if (tempFilename && typeof tempFilename === "string" && tempFilename.trim() !== "") {
+      const nuevaUrl = await actualizarImagenConId("animal", nuevoAnimal._id, tempFilename);
+      if (nuevaUrl) {
+        nuevoAnimal.fotoAnimal = nuevaUrl;
+        await nuevoAnimal.save();
+      }
+    }
 
     // Asociar el animal al usuario
-    usuario.animales.push(animal._id);
+    usuario.animales.push(nuevoAnimal._id);
     await usuario.save();
 
-    res.json({ message: "Animal registrado con éxito", animal });
+    res.json({ message: "Animal registrado con éxito", animal: nuevoAnimal });
   } catch (error) {
-    res
-      .status(500)
-      .json({ error: "Error al agregar el animal", details: error.message });
+    console.error("Error al agregar el animal:", error);
+    res.status(500).json({ error: "Error al agregar el animal", details: error.message });
   }
 };
 
@@ -95,15 +110,15 @@ export const editarAnimal = async (req, res) => {
 
   try {
     const animal = await Animales.findById(id);
-        if (!animal) {
-          return res.status(404).json({ error: "Usuario no encontrado" });
-        }
-        if (req.file) {
-          const baseUrl = "https://curapata-api.onrender.com"; // Cambia esta URL según tu dominio
-          const fotoAnimalUrl = `${baseUrl}/uploads/animales/${req.file.filename}`;
-          animal.fotoAnimal = fotoAnimalUrl;
-          await animal.save();
-        }
+    if (!animal) {
+      return res.status(404).json({ error: "Usuario no encontrado" });
+    }
+    if (req.file) {
+      const baseUrl = "https://curapata-api.onrender.com"; // Cambia esta URL según tu dominio
+      const fotoAnimalUrl = `${baseUrl}/uploads/animales/${req.file.filename}`;
+      animal.fotoAnimal = fotoAnimalUrl;
+      await animal.save();
+    }
     // Buscar y actualizar el animal por nombre
     const animalActualizado = await Animales.findByIdAndUpdate(id, req.body, {
       new: true,
@@ -145,4 +160,3 @@ export const eliminarAnimal = async (req, res) => {
       .json({ error: "Error al borrar el animal", details: error.message });
   }
 };
-
